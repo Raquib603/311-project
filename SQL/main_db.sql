@@ -208,3 +208,121 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+CREATE TABLE `subject` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+CREATE TABLE `student_tutor_schedule` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `student_id` int(11) NOT NULL,
+  `tutor_id` int(11) NOT NULL,
+  `subject_id` int(11) NOT NULL,
+  `schedule_time` datetime NOT NULL,
+  `status` varchar(15) NOT NULL DEFAULT 'pending',  -- pending, confirmed, completed, cancelled
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`student_id`) REFERENCES `user`(`id`),
+  FOREIGN KEY (`tutor_id`) REFERENCES `user`(`id`),
+  FOREIGN KEY (`subject_id`) REFERENCES `subject`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+CREATE TABLE `payment` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `student_id` int(11) NOT NULL,
+  `tutor_id` int(11) NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `payment_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `payment_status` varchar(15) NOT NULL DEFAULT 'pending',  -- pending, completed
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`student_id`) REFERENCES `user`(`id`),
+  FOREIGN KEY (`tutor_id`) REFERENCES `user`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+CREATE TABLE `reviews` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `student_id` int(11) NOT NULL,
+  `tutor_id` int(11) NOT NULL,
+  `rating` int(1) NOT NULL,  -- Rating scale from 1 to 5
+  `comments` text,
+  `review_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`student_id`) REFERENCES `user`(`id`),
+  FOREIGN KEY (`tutor_id`) REFERENCES `user`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `subjects_tutors` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tutor_id` int(11) NOT NULL,
+  `subject_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`tutor_id`) REFERENCES `user`(`id`),
+  FOREIGN KEY (`subject_id`) REFERENCES `subject`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `messages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sender_id` int(11) NOT NULL,
+  `receiver_id` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `message_time` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`sender_id`) REFERENCES `user`(`id`),
+  FOREIGN KEY (`receiver_id`) REFERENCES `user`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `session_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `student_id` int(11) NOT NULL,
+  `tutor_id` int(11) NOT NULL,
+  `subject_id` int(11) NOT NULL,
+  `session_date` datetime NOT NULL,
+  `session_duration` int(3) NOT NULL,  -- Duration in minutes
+  `session_status` varchar(15) NOT NULL DEFAULT 'completed',  -- completed, missed, rescheduled
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`student_id`) REFERENCES `user`(`id`),
+  FOREIGN KEY (`tutor_id`) REFERENCES `user`(`id`),
+  FOREIGN KEY (`subject_id`) REFERENCES `subject`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `notifications` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `status` varchar(10) NOT NULL DEFAULT 'unread',  -- unread, read
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `tutor_availability` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tutor_id` int(11) NOT NULL,
+  `day_of_week` varchar(10) NOT NULL,  -- e.g., Monday, Tuesday, etc.
+  `available_from` time NOT NULL,
+  `available_to` time NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`tutor_id`) REFERENCES `user`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `tutor_skills` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tutor_id` int(11) NOT NULL,
+  `skill` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`tutor_id`) REFERENCES `user`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
